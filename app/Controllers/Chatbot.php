@@ -24,6 +24,137 @@ class Chatbot extends BaseController
         ]);
     }
 
+    // Facebook Messenger Webhook Verification
+    public function webhook()
+    {
+        $mode = $this->request->getGet('hub_mode');
+        $token = $this->request->getGet('hub_verify_token');
+        $challenge = $this->request->getGet('hub_challenge');
+
+        // Replace 'your_verify_token' with a secure token of your choice
+        $verify_token = 'women_empowerment_2024';
+
+        if ($mode === 'subscribe' && $token === $verify_token) {
+            return $this->response->setBody($challenge);
+        }
+
+        return $this->response->setStatusCode(403);
+    }
+
+    // Facebook Messenger Message Handler
+    public function receiveMessage()
+    {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if (isset($input['entry'][0]['messaging'])) {
+            $messaging = $input['entry'][0]['messaging'][0];
+            $sender_id = $messaging['sender']['id'];
+            
+            if (isset($messaging['message']['text'])) {
+                $message = $messaging['message']['text'];
+                $this->handleFacebookMessage($sender_id, $message);
+            }
+        }
+
+        return $this->response->setBody('OK');
+    }
+
+    private function handleFacebookMessage($sender_id, $message)
+    {
+        // Get or create user session
+        $session = $this->getUserSession($sender_id);
+        $step = $session['step'] ?? 1;
+        
+        $response = $this->getBotResponse($message, $step);
+        
+        // Send response back to Facebook
+        $this->sendFacebookMessage($sender_id, $response['message']);
+        
+        // Update user session
+        $this->updateUserSession($sender_id, $response['next_step']);
+        
+        // Send quick replies if available
+        if (isset($response['options']) && !empty($response['options'])) {
+            $this->sendQuickReplies($sender_id, $response['options']);
+        }
+    }
+
+    private function sendFacebookMessage($recipient_id, $message)
+    {
+        $page_access_token = 'YOUR_PAGE_ACCESS_TOKEN'; // You'll get this from Facebook
+        
+        $data = [
+            'recipient' => ['id' => $recipient_id],
+            'message' => ['text' => $message]
+        ];
+
+        $this->callFacebookAPI($data, $page_access_token);
+    }
+
+    private function sendQuickReplies($recipient_id, $options)
+    {
+        $page_access_token = 'YOUR_PAGE_ACCESS_TOKEN'; // You'll get this from Facebook
+        
+        $quick_replies = [];
+        foreach ($options as $option) {
+            $quick_replies[] = [
+                'content_type' => 'text',
+                'title' => $option,
+                'payload' => $option
+            ];
+        }
+
+        $data = [
+            'recipient' => ['id' => $recipient_id],
+            'message' => [
+                'text' => 'Please choose an option:',
+                'quick_replies' => $quick_replies
+            ]
+        ];
+
+        $this->callFacebookAPI($data, $page_access_token);
+    }
+
+    private function callFacebookAPI($data, $page_access_token)
+    {
+        $url = "https://graph.facebook.com/v18.0/me/messages?access_token=" . $page_access_token;
+        
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        $result = curl_exec($ch);
+        curl_close($ch);
+        
+        return $result;
+    }
+
+    private function getUserSession($sender_id)
+    {
+        // Simple file-based session storage (in production, use a database)
+        $session_file = WRITEPATH . 'sessions/' . $sender_id . '.json';
+        
+        if (file_exists($session_file)) {
+            return json_decode(file_get_contents($session_file), true);
+        }
+        
+        return ['step' => 1];
+    }
+
+    private function updateUserSession($sender_id, $step)
+    {
+        $session_file = WRITEPATH . 'sessions/' . $sender_id . '.json';
+        $session_dir = dirname($session_file);
+        
+        if (!is_dir($session_dir)) {
+            mkdir($session_dir, 0755, true);
+        }
+        
+        file_put_contents($session_file, json_encode(['step' => $step]));
+    }
+
     private function getBotResponse($message, $step)
     {
         switch ($step) {
