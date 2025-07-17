@@ -16,3 +16,4 @@ $routes->post('chatbot/processMessage', 'Chatbot::processMessage');
 // Facebook Messenger webhook routes
 $routes->get('webhook', 'Chatbot::webhook');
 $routes->post('webhook', 'Chatbot::receiveMessage');
+$routes->get('test', 'Chatbot::test');

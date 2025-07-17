@@ -75,6 +75,16 @@ class Chatbot extends BaseController
         return $this->response->setBody('OK');
     }
 
+    // Test endpoint to verify webhook is working
+    public function test()
+    {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Webhook endpoint is working',
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+    }
+
     private function handleFacebookMessage($sender_id, $message)
     {
         // Get or create user session
