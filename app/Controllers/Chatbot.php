@@ -45,15 +45,31 @@ class Chatbot extends BaseController
     public function receiveMessage()
     {
         $input = json_decode(file_get_contents('php://input'), true);
+        
+        // Debug logging
+        $log_file = WRITEPATH . 'logs/facebook_webhook.log';
+        $log_dir = dirname($log_file);
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir, 0755, true);
+        }
+        
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - Received webhook: " . json_encode($input) . "\n", FILE_APPEND);
 
         if (isset($input['entry'][0]['messaging'])) {
             $messaging = $input['entry'][0]['messaging'][0];
             $sender_id = $messaging['sender']['id'];
             
+            file_put_contents($log_file, date('Y-m-d H:i:s') . " - Processing message from: " . $sender_id . "\n", FILE_APPEND);
+            
             if (isset($messaging['message']['text'])) {
                 $message = $messaging['message']['text'];
+                file_put_contents($log_file, date('Y-m-d H:i:s') . " - Message text: " . $message . "\n", FILE_APPEND);
                 $this->handleFacebookMessage($sender_id, $message);
+            } else {
+                file_put_contents($log_file, date('Y-m-d H:i:s') . " - No text message found\n", FILE_APPEND);
             }
+        } else {
+            file_put_contents($log_file, date('Y-m-d H:i:s') . " - No messaging data found\n", FILE_APPEND);
         }
 
         return $this->response->setBody('OK');
@@ -88,7 +104,14 @@ class Chatbot extends BaseController
             'message' => ['text' => $message]
         ];
 
-        $this->callFacebookAPI($data, $page_access_token);
+        $result = $this->callFacebookAPI($data, $page_access_token);
+        
+        // Debug logging
+        $log_file = WRITEPATH . 'logs/facebook_webhook.log';
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - Sending message to " . $recipient_id . ": " . $message . "\n", FILE_APPEND);
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - API Response: " . $result . "\n", FILE_APPEND);
+        
+        return $result;
     }
 
     private function sendQuickReplies($recipient_id, $options)
