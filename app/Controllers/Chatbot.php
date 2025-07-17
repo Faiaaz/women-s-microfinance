@@ -81,7 +81,7 @@ class Chatbot extends BaseController
 
     private function sendFacebookMessage($recipient_id, $message)
     {
-        $page_access_token = 'YOUR_PAGE_ACCESS_TOKEN'; // You'll get this from Facebook
+        $page_access_token = 'EAAPKDQxpu94BPH2wUO5lm7b6U1FDtJhGS3E9lagdJZBwoXYnnLdIQiXn82wewy8PY4zZC7666mLbk9S5NRZB0wZAEOxSubv3QW40hqWiJpOC97w0AOlWC444bQpFKxyH1SBoLgKuAjcAaci7JM4quYQp8GYDPM0V0HsJB4JPvNp9UelmTUyPDhgdzVsr2CkvOwtUyI40aAZDZD';
         
         $data = [
             'recipient' => ['id' => $recipient_id],
@@ -93,7 +93,7 @@ class Chatbot extends BaseController
 
     private function sendQuickReplies($recipient_id, $options)
     {
-        $page_access_token = 'YOUR_PAGE_ACCESS_TOKEN'; // You'll get this from Facebook
+        $page_access_token = 'EAAPKDQxpu94BPH2wUO5lm7b6U1FDtJhGS3E9lagdJZBwoXYnnLdIQiXn82wewy8PY4zZC7666mLbk9S5NRZB0wZAEOxSubv3QW40hqWiJpOC97w0AOlWC444bQpFKxyH1SBoLgKuAjcAaci7JM4quYQp8GYDPM0V0HsJB4JPvNp9UelmTUyPDhgdzVsr2CkvOwtUyI40aAZDZD';
         
         $quick_replies = [];
         foreach ($options as $option) {
