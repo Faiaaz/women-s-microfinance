@@ -34,10 +34,25 @@ class Chatbot extends BaseController
         // Use the verify token we discussed
         $verify_token = 'shakti_webhook_2024';
 
+        // Debug logging
+        $log_file = WRITEPATH . 'logs/facebook_webhook.log';
+        $log_dir = dirname($log_file);
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir, 0755, true);
+        }
+        
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - WEBHOOK VERIFICATION ATTEMPT\n", FILE_APPEND);
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - Mode: " . $mode . "\n", FILE_APPEND);
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - Token: " . $token . "\n", FILE_APPEND);
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - Challenge: " . $challenge . "\n", FILE_APPEND);
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - Expected Token: " . $verify_token . "\n", FILE_APPEND);
+
         if ($mode === 'subscribe' && $token === $verify_token) {
+            file_put_contents($log_file, date('Y-m-d H:i:s') . " - VERIFICATION SUCCESSFUL\n", FILE_APPEND);
             return $this->response->setBody($challenge);
         }
 
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - VERIFICATION FAILED\n", FILE_APPEND);
         return $this->response->setStatusCode(403);
     }
 
