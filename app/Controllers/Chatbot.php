@@ -96,10 +96,21 @@ class Chatbot extends BaseController
     // Test endpoint to verify webhook is working
     public function test()
     {
+        // Log this test request
+        $log_file = WRITEPATH . 'logs/facebook_webhook.log';
+        $log_dir = dirname($log_file);
+        if (!is_dir($log_dir)) {
+            mkdir($log_dir, 0755, true);
+        }
+        
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - TEST ENDPOINT HIT\n", FILE_APPEND);
+        
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Webhook endpoint is working',
-            'timestamp' => date('Y-m-d H:i:s')
+            'timestamp' => date('Y-m-d H:i:s'),
+            'webhook_url' => 'https://web-production-66a8.up.railway.app/facebook/webhook',
+            'verify_token' => 'shakti_webhook_2024'
         ]);
     }
 
