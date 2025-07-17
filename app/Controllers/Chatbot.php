@@ -31,8 +31,8 @@ class Chatbot extends BaseController
         $token = $this->request->getGet('hub_verify_token');
         $challenge = $this->request->getGet('hub_challenge');
 
-        // Replace 'your_verify_token' with a secure token of your choice
-        $verify_token = 'women_empowerment_2024';
+        // Use the verify token we discussed
+        $verify_token = 'shakti_webhook_2024';
 
         if ($mode === 'subscribe' && $token === $verify_token) {
             return $this->response->setBody($challenge);
