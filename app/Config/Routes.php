@@ -18,3 +18,4 @@ $routes->get('facebook/webhook', 'Chatbot::webhook');
 $routes->post('facebook/webhook', 'Chatbot::receiveMessage');
 $routes->get('test', 'Chatbot::test');
 $routes->get('test-message', 'Chatbot::testMessage');
+$routes->get('check-logs', 'Chatbot::checkLogs');

@@ -120,6 +120,28 @@ class Chatbot extends BaseController
         ]);
     }
 
+    // Check Facebook webhook logs
+    public function checkLogs()
+    {
+        $log_file = WRITEPATH . 'logs/facebook_webhook.log';
+        
+        if (file_exists($log_file)) {
+            $logs = file_get_contents($log_file);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'logs' => $logs,
+                'file_size' => filesize($log_file),
+                'last_modified' => date('Y-m-d H:i:s', filemtime($log_file))
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Log file does not exist',
+                'log_file_path' => $log_file
+            ]);
+        }
+    }
+
     private function handleFacebookMessage($sender_id, $message)
     {
         // Get or create user session
