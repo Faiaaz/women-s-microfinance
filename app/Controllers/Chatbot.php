@@ -88,6 +88,23 @@ class Chatbot extends BaseController
         ]);
     }
 
+    // Test endpoint to simulate Facebook message
+    public function testMessage()
+    {
+        // Simulate a Facebook message
+        $test_sender_id = '123456789';
+        $test_message = 'Hello';
+        
+        $this->handleFacebookMessage($test_sender_id, $test_message);
+        
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Test message processed',
+            'sender_id' => $test_sender_id,
+            'message_text' => $test_message
+        ]);
+    }
+
     private function handleFacebookMessage($sender_id, $message)
     {
         // Get or create user session

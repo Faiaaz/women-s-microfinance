@@ -17,3 +17,4 @@ $routes->post('chatbot/processMessage', 'Chatbot::processMessage');
 $routes->get('webhook', 'Chatbot::webhook');
 $routes->post('webhook', 'Chatbot::receiveMessage');
 $routes->get('test', 'Chatbot::test');
+$routes->get('test-message', 'Chatbot::testMessage');
