@@ -44,15 +44,18 @@ class Chatbot extends BaseController
     // Facebook Messenger Message Handler
     public function receiveMessage()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        // Debug logging
+        // Simple test response to see if Facebook is reaching us
         $log_file = WRITEPATH . 'logs/facebook_webhook.log';
         $log_dir = dirname($log_file);
         if (!is_dir($log_dir)) {
             mkdir($log_dir, 0755, true);
         }
         
+        file_put_contents($log_file, date('Y-m-d H:i:s') . " - WEBHOOK HIT!\n", FILE_APPEND);
+        
+        $input = json_decode(file_get_contents('php://input'), true);
+        
+        // Debug logging
         file_put_contents($log_file, date('Y-m-d H:i:s') . " - Received webhook: " . json_encode($input) . "\n", FILE_APPEND);
 
         if (isset($input['entry'][0]['messaging'])) {
